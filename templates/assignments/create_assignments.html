@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Assignment{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-plus"></i> Create Assignment</h2>
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label>Course</label>
+                        <select name="course" class="form-select" required>
+                            <option value="">Select Course</option>
+                            {% for course in courses %}
+                            <option value="{{ course.id }}">{{ course.code }} - {{ course.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label>Title</label>
+                        <input type="text" name="title" class="form-control" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label>Description</label>
+                        <textarea name="description" class="form-control" rows="4" required></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label>Total Marks</label>
+                            <input type="number" name="total_marks" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Deadline</label>
+                            <input type="datetime-local" name="deadline" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label>Attachment (Optional)</label>
+                        <input type="file" name="file" class="form-control">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Create Assignment
+                    </button>
+                    <a href="{% url 'assignments:list' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

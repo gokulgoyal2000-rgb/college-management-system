@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Payment{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-plus"></i> Add Fee Payment</h2>
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label>Student</label>
+                        <select name="student" class="form-select" required>
+                            <option value="">Select Student</option>
+                            {% for student in students %}
+                            <option value="{{ student.id }}">
+                                {{ student.roll_number }} - {{ student.user.get_full_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label>Fee Structure</label>
+                        <select name="fee_structure" class="form-select" required>
+                            <option value="">Select Fee Structure</option>
+                            {% for fee in fee_structures %}
+                            <option value="{{ fee.id }}">
+                                Year {{ fee.year }}, Semester {{ fee.semester }} - ₹{{ fee.total_fee|floatformat:0 }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label>Amount Paid</label>
+                            <input type="number" name="amount_paid" class="form-control" step="0.01" required>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label>Payment Method</label>
+                            <select name="payment_method" class="form-select" required>
+                                <option value="cash">Cash</option>
+                                <option value="card">Card</option>
+                                <option value="online">Online Transfer</option>
+                                <option value="cheque">Cheque</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label>Transaction ID</label>
+                            <input type="text" name="transaction_id" class="form-control" required>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label>Receipt Number</label>
+                            <input type="text" name="receipt_number" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label>Status</label>
+                        <select name="status" class="form-select" required>
+                            <option value="paid">Paid</option>
+                            <option value="pending">Pending</option>
+                            <option value="partial">Partial</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Add Payment
+                    </button>
+                    <a href="{% url 'fees:details' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

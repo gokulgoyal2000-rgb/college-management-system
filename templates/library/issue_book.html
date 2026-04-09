@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Issue Book{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-book"></i> Issue Book</h2>
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label>Book</label>
+                        <select name="book" class="form-select" required>
+                            <option value="">Select Book</option>
+                            {% for book in books %}
+                            <option value="{{ book.id }}">
+                                {{ book.title }} - {{ book.author }} (Available: {{ book.available_copies }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label>Member Type</label>
+                        <select name="member_type" id="memberType" class="form-select" required>
+                            <option value="">Select Type</option>
+                            <option value="student">Student</option>
+                            <option value="teacher">Teacher</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3" id="studentSelect" style="display: none;">
+                        <label>Student</label>
+                        <select name="member_id" class="form-select">
+                            <option value="">Select Student</option>
+                            {% for student in students %}
+                            <option value="{{ student.id }}">
+                                {{ student.roll_number }} - {{ student.user.get_full_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3" id="teacherSelect" style="display: none;">
+                        <label>Teacher</label>
+                        <select name="member_id" class="form-select">
+                            <option value="">Select Teacher</option>
+                            {% for teacher in teachers %}
+                            <option value="{{ teacher.id }}">
+                                {{ teacher.employee_id }} - {{ teacher.user.get_full_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check"></i> Issue Book
+                    </button>
+                    <a href="{% url 'library:view' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('memberType').addEventListener('change', function() {
+        var studentSelect = document.getElementById('studentSelect');
+        var teacherSelect = document.getElementById('teacherSelect');
+        
+        if (this.value === 'student') {
+            studentSelect.style.display = 'block';
+            teacherSelect.style.display = 'none';
+            teacherSelect.querySelector('select').removeAttribute('required');
+            studentSelect.querySelector('select').setAttribute('required', 'required');
+        } else if (this.value === 'teacher') {
+            teacherSelect.style.display = 'block';
+            studentSelect.style.display = 'none';
+            studentSelect.querySelector('select').removeAttribute('required');
+            teacherSelect.querySelector('select').setAttribute('required', 'required');
+        } else {
+            studentSelect.style.display = 'none';
+            teacherSelect.style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}

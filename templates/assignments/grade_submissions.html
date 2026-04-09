@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Grade Submissions{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-check"></i> Grade Submissions</h2>
+<p class="lead">{{ assignment.title }}</p>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Submitted At</th>
+                        <th>File</th>
+                        <th>Marks</th>
+                        <th>Feedback</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for submission in submissions %}
+                    <tr>
+                        <td>{{ submission.student.user.get_full_name }}</td>
+                        <td>{{ submission.submitted_at|date:"M d, Y H:i" }}</td>
+                        <td>
+                            <a href="{{ submission.file.url }}" target="_blank" class="btn btn-sm btn-info">
+                                <i class="fas fa-download"></i> View
+                            </a>
+                        </td>
+                        <td>
+                            <input type="number" name="marks_{{ submission.id }}" 
+                                   class="form-control" min="0" max="{{ assignment.total_marks }}"
+                                   value="{{ submission.marks_obtained|default:'' }}" step="0.01">
+                        </td>
+                        <td>
+                            <textarea name="feedback_{{ submission.id }}" class="form-control" rows="2">{{ submission.feedback }}</textarea>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <button type="submit" class="btn btn-success">
+                <i class="fas fa-save"></i> Save Grades
+            </button>
+            <a href="{% url 'assignments:list' %}" class="btn btn-secondary">Back</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

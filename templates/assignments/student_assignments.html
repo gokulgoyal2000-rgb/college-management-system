@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}My Assignments{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-tasks"></i> My Assignments</h2>
+
+<div class="row mt-4">
+    {% for assignment in assignments %}
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header">
+                {{ assignment.course.code }} - {{ assignment.title }}
+            </div>
+            <div class="card-body">
+                <p>{{ assignment.description }}</p>
+                <p class="mb-1">
+                    <strong>Deadline:</strong> {{ assignment.deadline|date:"M d, Y H:i" }}
+                </p>
+                <p class="mb-1">
+                    <strong>Total Marks:</strong> {{ assignment.total_marks }}
+                </p>
+                
+                {% if assignment.id in submitted_ids %}
+                    {% with submission=submissions|dictsort:"assignment_id"|first %}
+                    <span class="badge bg-success">
+                        <i class="fas fa-check"></i> Submitted
+                    </span>
+                    {% if submission.graded %}
+                        <p class="mt-2">
+                            <strong>Score:</strong> {{ submission.marks_obtained }}/{{ assignment.total_marks }}
+                        </p>
+                    {% endif %}
+                    {% endwith %}
+                {% else %}
+                    <a href="{% url 'assignments:submit' assignment.id %}" class="btn btn-primary btn-sm mt-2">
+                        <i class="fas fa-upload"></i> Submit Assignment
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p class="text-muted">No assignments available.</p>
+    {% endfor %}
+</div>
+{% endblock %}

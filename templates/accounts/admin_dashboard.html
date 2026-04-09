@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-user-shield"></i> Admin Dashboard</h2>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row">
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <h6 class="text-muted">Total Students</h6>
+                <h2>{{ total_students }}</h2>
+                <small><i class="fas fa-user-graduate"></i> Enrolled</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stat-card success">
+            <div class="card-body">
+                <h6 class="text-muted">Total Teachers</h6>
+                <h2>{{ total_teachers }}</h2>
+                <small><i class="fas fa-chalkboard-teacher"></i> Active</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stat-card warning">
+            <div class="card-body">
+                <h6 class="text-muted">Total Courses</h6>
+                <h2>{{ total_courses }}</h2>
+                <small><i class="fas fa-book"></i> Available</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stat-card danger">
+            <div class="card-body">
+                <h6 class="text-muted">Notices</h6>
+                <h2>{{ recent_notices.count }}</h2>
+                <small><i class="fas fa-bullhorn"></i> Active</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-bolt"></i> Quick Actions
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <a href="/admin/accounts/studentprofile/add/" class="btn btn-primary w-100">
+                            <i class="fas fa-user-plus"></i> Add Student
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="/admin/accounts/teacherprofile/add/" class="btn btn-success w-100">
+                            <i class="fas fa-user-tie"></i> Add Teacher
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'timetable:create' %}" class="btn btn-warning w-100">
+                            <i class="fas fa-calendar"></i> Create Timetable
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'notices:create' %}" class="btn btn-info w-100">
+                            <i class="fas fa-bullhorn"></i> Post Notice
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Management Links -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-cog"></i> System Management
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <a href="{% url 'analytics:dashboard' %}">
+                            <i class="fas fa-chart-pie"></i> View Analytics & Reports
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'fees:details' %}">
+                            <i class="fas fa-money-bill"></i> Fee Management
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'library:view' %}">
+                            <i class="fas fa-book-reader"></i> Library Management
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/admin/">
+                            <i class="fas fa-database"></i> Full Admin Panel
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-bullhorn"></i> Recent Notices
+            </div>
+            <div class="card-body">
+                {% if recent_notices %}
+                    {% for notice in recent_notices %}
+                    <div class="alert alert-info">
+                        <h6>{{ notice.title }}</h6>
+                        <small class="text-muted">{{ notice.created_at|date:"M d, Y" }} - {{ notice.posted_by.get_full_name }}</small>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No notices available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

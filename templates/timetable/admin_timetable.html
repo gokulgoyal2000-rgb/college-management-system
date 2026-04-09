@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Timetable Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-clock"></i> Timetable Management</h2>
+    <a href="{% url 'timetable:create' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Create Timeslot
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-list"></i> All Timetable Slots
+    </div>
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    <th>Time</th>
+                    <th>Course</th>
+                    <th>Teacher</th>
+                    <th>Room</th>
+                    <th>Year/Sem</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for slot in timetables %}
+                <tr>
+                    <td>{{ slot.get_day_display }}</td>
+                    <td>{{ slot.start_time|time:"g:i A" }} - {{ slot.end_time|time:"g:i A" }}</td>
+                    <td>{{ slot.course.code }} - {{ slot.course.name }}</td>
+                    <td>{{ slot.teacher.user.get_full_name }}</td>
+                    <td>{{ slot.room_number }}</td>
+                    <td>Year {{ slot.year }}, Sem {{ slot.semester }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

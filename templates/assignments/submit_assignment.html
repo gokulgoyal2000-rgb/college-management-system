@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Submit Assignment{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-upload"></i> Submit Assignment</h2>
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                {{ assignment.title }}
+            </div>
+            <div class="card-body">
+                <p><strong>Course:</strong> {{ assignment.course.code }} - {{ assignment.course.name }}</p>
+                <p><strong>Description:</strong> {{ assignment.description }}</p>
+                <p><strong>Deadline:</strong> {{ assignment.deadline|date:"M d, Y H:i" }}</p>
+                <p><strong>Total Marks:</strong> {{ assignment.total_marks }}</p>
+                
+                <hr>
+                
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label>Upload File <span class="text-danger">*</span></label>
+                        <input type="file" name="file" class="form-control" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label>Remarks (Optional)</label>
+                        <textarea name="remarks" class="form-control" rows="3" 
+                                  placeholder="Any comments..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload"></i> Submit Assignment
+                    </button>
+                    <a href="{% url 'assignments:list' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

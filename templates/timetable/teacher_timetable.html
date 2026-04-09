@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}My Teaching Schedule{% endblock %}
+
+{% block extra_css %}
+<style>
+    .day-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+    .time-slot {
+        border-left: 4px solid #27ae60;
+        padding: 10px;
+        margin-bottom: 10px;
+        background: #f8f9fa;
+        border-radius: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-clock"></i> My Teaching Schedule</h2>
+
+<div class="row mt-4">
+    {% for day, slots in schedule.items %}
+    <div class="col-md-12 mb-4">
+        <div class="day-header">
+            <h5 class="mb-0">
+                <i class="fas fa-calendar-day"></i> {{ day|title }}
+            </h5>
+        </div>
+        
+        {% if slots %}
+            {% for slot in slots %}
+            <div class="time-slot">
+                <div class="row align-items-center">
+                    <div class="col-md-2">
+                        <strong>{{ slot.start_time|time:"g:i A" }} - {{ slot.end_time|time:"g:i A" }}</strong>
+                    </div>
+                    <div class="col-md-4">
+                        <h6 class="mb-0">{{ slot.course.code }} - {{ slot.course.name }}</h6>
+                        <small class="text-muted">Year {{ slot.year }}, Semester {{ slot.semester }}</small>
+                    </div>
+                    <div class="col-md-2">
+                        <i class="fas fa-door-open"></i> Room {{ slot.room_number }}
+                    </div>
+                    <div class="col-md-2">
+                        <i class="fas fa-users"></i> {{ slot.course.students.count }} Students
+                    </div>
+                    <div class="col-md-2">
+                        <a href="{% url 'attendance:mark' slot.course.id %}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-check"></i> Mark Attendance
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> No classes scheduled for this day.
+            </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

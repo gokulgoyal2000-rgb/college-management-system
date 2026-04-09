@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-box {
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+    }
+    .chart-container {
+        position: relative;
+        height: 300px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-chart-pie"></i> Analytics Dashboard</h2>
+
+<!-- Overall Statistics -->
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body stat-box">
+                <h6 class="text-muted">Total Students</h6>
+                <h2>{{ total_students }}</h2>
+                <i class="fas fa-user-graduate fa-2x text-primary"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stat-card success">
+            <div class="card-body stat-box">
+                <h6 class="text-muted">Total Teachers</h6>
+                <h2>{{ total_teachers }}</h2>
+                <i class="fas fa-chalkboard-teacher fa-2x text-success"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stat-card warning">
+            <div class="card-body stat-box">
+                <h6 class="text-muted">Total Departments</h6>
+                <h2>{{ total_departments }}</h2>
+                <i class="fas fa-building fa-2x text-warning"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stat-card danger">
+            <div class="card-body stat-box">
+                <h6 class="text-muted">Total Courses</h6>
+                <h2>{{ total_courses }}</h2>
+                <i class="fas fa-book fa-2x text-danger"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Attendance & Performance -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-calendar-check"></i> Attendance Overview
+            </div>
+            <div class="card-body">
+                <h4>Overall Attendance: {{ overall_attendance }}%</h4>
+                <div class="progress mb-3" style="height: 30px;">
+                    <div class="progress-bar {% if overall_attendance >= 75 %}bg-success{% else %}bg-danger{% endif %}" 
+                         style="width: {{ overall_attendance }}%">
+                        {{ overall_attendance }}%
+                    </div>
+                </div>
+                
+                <h6 class="mt-4">Department-wise Attendance</h6>
+                <canvas id="attendanceChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-bar"></i> Grade Distribution
+            </div>
+            <div class="card-body">
+                <h6>Average Marks: {{ avg_marks }}</h6>
+                <canvas id="gradeChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Financial & Library Stats -->
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-money-bill"></i> Fee Collection
+            </div>
+            <div class="card-body text-center">
+                <h3 class="text-success">₹{{ total_collected|floatformat:0 }}</h3>
+                <p class="text-muted">Total Collected</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-book-reader"></i> Library Statistics
+            </div>
+            <div class="card-body">
+                <p><strong>Total Issues:</strong> {{ total_books_issued }}</p>
+                <p><strong>Overdue Books:</strong> 
+                    <span class="badge bg-danger">{{ books_overdue }}</span>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-exclamation-triangle"></i> Low Attendance Alert
+            </div>
+            <div class="card-body">
+                <p class="text-danger">
+                    <strong>{{ low_attendance_students|length }}</strong> students below 75%
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Low Attendance Students -->
+{% if low_attendance_students %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-exclamation-circle"></i> Students with Low Attendance (Below 75%)
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Roll Number</th>
+                            <th>Name</th>
+                            <th>Attendance %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in low_attendance_students %}
+                        <tr>
+                            <td>{{ student.roll_number }}</td>
+                            <td>{{ student.name }}</td>
+                            <td>
+                                <span class="badge bg-danger">{{ student.percentage }}%</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Department-wise Attendance Chart
+    const deptData = {{ dept_attendance|safe }};
+    const deptLabels = deptData.map(d => d.name);
+    const deptValues = deptData.map(d => d.percentage);
+    
+    new Chart(document.getElementById('attendanceChart'), {
+        type: 'bar',
+        data: {
+            labels: deptLabels,
+            datasets: [{
+                label: 'Attendance %',
+                data: deptValues,
+                backgroundColor: 'rgba(52, 152, 219, 0.5)',
+                borderColor: 'rgba(52, 152, 219, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+    
+    // Grade Distribution Chart
+    const gradeData = {{ grade_distribution|safe }};
+    const gradeLabels = Object.keys(gradeData);
+    const gradeValues = Object.values(gradeData);
+    
+    new Chart(document.getElementById('gradeChart'), {
+        type: 'pie',
+        data: {
+            labels: gradeLabels,
+            datasets: [{
+                data: gradeValues,
+                backgroundColor: [
+                    '#27ae60', '#2ecc71', '#3498db', '#9b59b6', 
+                    '#f39c12', '#e67e22', '#e74c3c'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true
+        }
+    });
+</script>
+{% endblock %}

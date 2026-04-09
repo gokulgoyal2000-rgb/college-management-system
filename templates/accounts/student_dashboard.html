@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-tachometer-alt"></i> Student Dashboard</h2>
+    <span class="badge bg-primary">{{ student.roll_number }}</span>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row">
+    <div class="col-md-3">
+        <div class="card stat-card {% if attendance_percentage >= 75 %}success{% else %}danger{% endif %}">
+            <div class="card-body">
+                <h6 class="text-muted">Attendance</h6>
+                <h2>{{ attendance_percentage }}%</h2>
+                <small>{{ present_classes }}/{{ total_classes }} classes</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <h6 class="text-muted">Courses</h6>
+                <h2>{{ student.courses.count }}</h2>
+                <small>Enrolled</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stat-card warning">
+            <div class="card-body">
+                <h6 class="text-muted">Pending Assignments</h6>
+                <h2>{{ pending_assignments.count }}</h2>
+                <small>Due soon</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <h6 class="text-muted">Year</h6>
+                <h2>{{ student.get_year_display }}</h2>
+                <small>Semester {{ student.semester }}</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Marks -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-line"></i> Recent Marks
+            </div>
+            <div class="card-body">
+                {% if recent_marks %}
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Course</th>
+                                <th>Exam Type</th>
+                                <th>Marks</th>
+                                <th>Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for mark in recent_marks %}
+                            <tr>
+                                <td>{{ mark.course.code }}</td>
+                                <td>{{ mark.get_exam_type_display }}</td>
+                                <td>{{ mark.marks_obtained }}/{{ mark.total_marks }}</td>
+                                <td><span class="badge bg-primary">{{ mark.grade }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-muted">No marks available yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pending Assignments -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-tasks"></i> Pending Assignments
+            </div>
+            <div class="card-body">
+                {% if pending_assignments %}
+                    <ul class="list-group">
+                        {% for assignment in pending_assignments %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ assignment.title }}</strong><br>
+                                <small class="text-muted">{{ assignment.course.code }}</small>
+                            </div>
+                            <span class="badge bg-warning">{{ assignment.deadline|date:"M d" }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">No pending assignments.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Notices -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-bullhorn"></i> Recent Notices
+            </div>
+            <div class="card-body">
+                {% if recent_notices %}
+                    {% for notice in recent_notices %}
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-info-circle"></i> {{ notice.title }}</h6>
+                        <p class="mb-0">{{ notice.content|truncatewords:20 }}</p>
+                        <small class="text-muted">Posted on {{ notice.created_at|date:"M d, Y" }}</small>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No notices available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

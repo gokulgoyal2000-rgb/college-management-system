@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Library{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-book-reader"></i> Library</h2>
+
+<!-- Currently Issued Books -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-book-open"></i> Currently Issued Books
+            </div>
+            <div class="card-body">
+                {% if issued_books %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Book Title</th>
+                            <th>Author</th>
+                            <th>Issue Date</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for issue in issued_books %}
+                        <tr>
+                            <td>{{ issue.book.title }}</td>
+                            <td>{{ issue.book.author }}</td>
+                            <td>{{ issue.issue_date|date:"M d, Y" }}</td>
+                            <td>{{ issue.due_date|date:"M d, Y" }}</td>
+                            <td>
+                                {% if issue.due_date < today %}
+                                <span class="badge bg-danger">Overdue</span>
+                                {% else %}
+                                <span class="badge bg-success">Active</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted">You don't have any books issued currently.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- History -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-history"></i> Issue History
+            </div>
+            <div class="card-body">
+                {% if history %}
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Book Title</th>
+                            <th>Issue Date</th>
+                            <th>Return Date</th>
+                            <th>Fine</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for issue in history %}
+                        <tr>
+                            <td>{{ issue.book.title }}</td>
+                            <td>{{ issue.issue_date|date:"M d, Y" }}</td>
+                            <td>{{ issue.return_date|date:"M d, Y" }}</td>
+                            <td>
+                                {% if issue.fine_amount > 0 %}
+                                <span class="text-danger">₹{{ issue.fine_amount|floatformat:0 }}</span>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted">No history available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

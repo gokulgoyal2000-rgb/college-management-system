@@ -1,0 +1,283 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}College Management System{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar {
+            min-height: calc(100vh - 56px);
+            background-color: #fff;
+            box-shadow: 2px 0 5px rgba(0,0,0,.1);
+            padding-top: 20px;
+        }
+        
+        .sidebar .nav-link {
+            color: var(--primary-color);
+            padding: 15px 20px;
+            border-left: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link:hover {
+            background-color: #f8f9fa;
+            border-left-color: var(--secondary-color);
+        }
+        
+        .sidebar .nav-link.active {
+            background-color: #e9ecef;
+            border-left-color: var(--secondary-color);
+            font-weight: 600;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.1);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            font-weight: 600;
+        }
+        
+        .stat-card {
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .stat-card.success {
+            border-left-color: var(--success-color);
+        }
+        
+        .stat-card.warning {
+            border-left-color: var(--warning-color);
+        }
+        
+        .stat-card.danger {
+            border-left-color: var(--danger-color);
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+        
+        .table thead {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .badge-custom {
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .content-area {
+            padding: 20px;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'accounts:dashboard' %}">
+                <i class="fas fa-graduation-cap"></i> College Management
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle"></i> {{ user.get_full_name|default:user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="fas fa-user"></i> Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                            </ul>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            {% if user.is_authenticated %}
+            <!-- Sidebar -->
+            <nav class="col-md-2 d-md-block sidebar">
+                <div class="position-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:dashboard' %}">
+                                <i class="fas fa-home"></i> Dashboard
+                            </a>
+                        </li>
+                        
+                        {% if user.user_type == 'student' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'attendance:list' %}">
+                                    <i class="fas fa-calendar-check"></i> Attendance
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'marks:list' %}">
+                                    <i class="fas fa-chart-line"></i> Marks
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'assignments:list' %}">
+                                    <i class="fas fa-tasks"></i> Assignments
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'notes:list' %}">
+                                    <i class="fas fa-book"></i> Notes
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'timetable:view' %}">
+                                    <i class="fas fa-clock"></i> Timetable
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'fees:details' %}">
+                                    <i class="fas fa-money-bill"></i> Fees
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'library:view' %}">
+                                    <i class="fas fa-book-reader"></i> Library
+                                </a>
+                            </li>
+                        {% elif user.user_type == 'teacher' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'attendance:list' %}">
+                                    <i class="fas fa-calendar-check"></i> Attendance
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'marks:list' %}">
+                                    <i class="fas fa-chart-line"></i> Marks
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'assignments:list' %}">
+                                    <i class="fas fa-tasks"></i> Assignments
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'notes:list' %}">
+                                    <i class="fas fa-book"></i> Notes
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'timetable:view' %}">
+                                    <i class="fas fa-clock"></i> Timetable
+                                </a>
+                            </li>
+                        {% elif user.user_type == 'admin' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'analytics:dashboard' %}">
+                                    <i class="fas fa-chart-pie"></i> Analytics
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'timetable:view' %}">
+                                    <i class="fas fa-clock"></i> Timetable
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'fees:details' %}">
+                                    <i class="fas fa-money-bill"></i> Fee Management
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'library:view' %}">
+                                    <i class="fas fa-book-reader"></i> Library
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/admin/">
+                                    <i class="fas fa-cog"></i> Admin Panel
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'notices:list' %}">
+                                <i class="fas fa-bullhorn"></i> Notices
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            {% endif %}
+
+            <!-- Main Content -->
+            <main class="col-md-{% if user.is_authenticated %}10{% else %}12{% endif %} ms-sm-auto content-area">
+                <!-- Messages -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
